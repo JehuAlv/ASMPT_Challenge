@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmtOrderManager.Api/SmtOrderManager.Api.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmtOrderManager.Tests/SmtOrderManager.Tests.csproj" />
+  </Folder>
+</Solution>
