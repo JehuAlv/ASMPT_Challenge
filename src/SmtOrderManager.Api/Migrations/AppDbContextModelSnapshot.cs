@@ -17,6 +17,36 @@ namespace SmtOrderManager.Api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
 
+            modelBuilder.Entity("BoardComponent", b =>
+                {
+                    b.Property<int>("BoardsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ComponentsId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("BoardsId", "ComponentsId");
+
+                    b.HasIndex("ComponentsId");
+
+                    b.ToTable("BoardComponent");
+                });
+
+            modelBuilder.Entity("BoardOrder", b =>
+                {
+                    b.Property<int>("BoardsId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("OrdersId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("BoardsId", "OrdersId");
+
+                    b.HasIndex("OrdersId");
+
+                    b.ToTable("BoardOrder");
+                });
+
             modelBuilder.Entity("SmtOrderManager.Api.Entities.Board", b =>
                 {
                     b.Property<int>("Id")
@@ -40,21 +70,6 @@ namespace SmtOrderManager.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Boards");
-                });
-
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.BoardComponent", b =>
-                {
-                    b.Property<int>("BoardId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ComponentId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("BoardId", "ComponentId");
-
-                    b.HasIndex("ComponentId");
-
-                    b.ToTable("BoardComponent");
                 });
 
             modelBuilder.Entity("SmtOrderManager.Api.Entities.Component", b =>
@@ -105,74 +120,34 @@ namespace SmtOrderManager.Api.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.OrderBoard", b =>
+            modelBuilder.Entity("BoardComponent", b =>
                 {
-                    b.Property<int>("OrderId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("BoardId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("OrderId", "BoardId");
-
-                    b.HasIndex("BoardId");
-
-                    b.ToTable("OrderBoard");
-                });
-
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.BoardComponent", b =>
-                {
-                    b.HasOne("SmtOrderManager.Api.Entities.Board", "Board")
-                        .WithMany("BoardComponents")
-                        .HasForeignKey("BoardId")
+                    b.HasOne("SmtOrderManager.Api.Entities.Board", null)
+                        .WithMany()
+                        .HasForeignKey("BoardsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("SmtOrderManager.Api.Entities.Component", "Component")
-                        .WithMany("BoardComponents")
-                        .HasForeignKey("ComponentId")
+                    b.HasOne("SmtOrderManager.Api.Entities.Component", null)
+                        .WithMany()
+                        .HasForeignKey("ComponentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("BoardOrder", b =>
+                {
+                    b.HasOne("SmtOrderManager.Api.Entities.Board", null)
+                        .WithMany()
+                        .HasForeignKey("BoardsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Board");
-
-                    b.Navigation("Component");
-                });
-
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.OrderBoard", b =>
-                {
-                    b.HasOne("SmtOrderManager.Api.Entities.Board", "Board")
-                        .WithMany("OrderBoards")
-                        .HasForeignKey("BoardId")
+                    b.HasOne("SmtOrderManager.Api.Entities.Order", null)
+                        .WithMany()
+                        .HasForeignKey("OrdersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("SmtOrderManager.Api.Entities.Order", "Order")
-                        .WithMany("OrderBoards")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Board");
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.Board", b =>
-                {
-                    b.Navigation("BoardComponents");
-
-                    b.Navigation("OrderBoards");
-                });
-
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.Component", b =>
-                {
-                    b.Navigation("BoardComponents");
-                });
-
-            modelBuilder.Entity("SmtOrderManager.Api.Entities.Order", b =>
-                {
-                    b.Navigation("OrderBoards");
                 });
 #pragma warning restore 612, 618
         }

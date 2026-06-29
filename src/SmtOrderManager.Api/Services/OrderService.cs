@@ -19,42 +19,39 @@ public class OrderService : IOrderService
     public async Task<List<Order>> GetAllAsync()
     {
         return await _context.Orders
-            .Include(o => o.OrderBoards)
-                .ThenInclude(ob => ob.Board)
+            .Include(o => o.Boards)
             .ToListAsync();
     }
 
     public async Task<Order?> GetByIdAsync(int id)
     {
         return await _context.Orders
-            .Include(o => o.OrderBoards)
-                .ThenInclude(ob => ob.Board)
+            .Include(o => o.Boards)
             .FirstOrDefaultAsync(o => o.Id == id);
     }
 
     public async Task<List<Order>> SearchAsync(string name)
     {
         return await _context.Orders
-            .Include(o => o.OrderBoards)
-                .ThenInclude(ob => ob.Board)
+            .Include(o => o.Boards)
             .Where(o => o.Name.Contains(name))
             .ToListAsync();
     }
 
     public async Task<Order> CreateAsync(CreateOrderRequest request)
     {
+        var boards = await _context.Boards
+            .Where(b => request.BoardIds.Contains(b.Id))
+            .ToListAsync();
+
         var order = new Order
         {
             Name = request.Name,
             Description = request.Description,
             OrderDate = request.OrderDate,
-            Status = "Created"
+            Status = "Created",
+            Boards = boards
         };
-
-        foreach (var boardId in request.BoardIds)
-        {
-            order.OrderBoards.Add(new OrderBoard { BoardId = boardId });
-        }
 
         _context.Orders.Add(order);
         await _context.SaveChangesAsync();
@@ -67,7 +64,7 @@ public class OrderService : IOrderService
     public async Task<Order?> UpdateAsync(int id, UpdateOrderRequest request)
     {
         var order = await _context.Orders
-            .Include(o => o.OrderBoards)
+            .Include(o => o.Boards)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null) return null;
@@ -76,11 +73,12 @@ public class OrderService : IOrderService
         order.Description = request.Description;
         order.OrderDate = request.OrderDate;
 
-        order.OrderBoards.Clear();
-        foreach (var boardId in request.BoardIds)
-        {
-            order.OrderBoards.Add(new OrderBoard { BoardId = boardId });
-        }
+        var boards = await _context.Boards
+            .Where(b => request.BoardIds.Contains(b.Id))
+            .ToListAsync();
+
+        order.Boards.Clear();
+        order.Boards.AddRange(boards);
 
         await _context.SaveChangesAsync();
 
@@ -105,10 +103,8 @@ public class OrderService : IOrderService
     public async Task<Order?> DownloadAsync(int id)
     {
         var order = await _context.Orders
-            .Include(o => o.OrderBoards)
-                .ThenInclude(ob => ob.Board)
-                    .ThenInclude(b => b.BoardComponents)
-                        .ThenInclude(bc => bc.Component)
+            .Include(o => o.Boards)
+                .ThenInclude(b => b.Components)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         if (order == null) return null;

@@ -19,42 +19,39 @@ public class BoardService : IBoardService
     public async Task<List<Board>> GetAllAsync()
     {
         return await _context.Boards
-            .Include(b => b.BoardComponents)
-                .ThenInclude(bc => bc.Component)
+            .Include(b => b.Components)
             .ToListAsync();
     }
 
     public async Task<Board?> GetByIdAsync(int id)
     {
         return await _context.Boards
-            .Include(b => b.BoardComponents)
-                .ThenInclude(bc => bc.Component)
+            .Include(b => b.Components)
             .FirstOrDefaultAsync(b => b.Id == id);
     }
 
     public async Task<List<Board>> SearchAsync(string name)
     {
         return await _context.Boards
-            .Include(b => b.BoardComponents)
-                .ThenInclude(bc => bc.Component)
+            .Include(b => b.Components)
             .Where(b => b.Name.Contains(name))
             .ToListAsync();
     }
 
     public async Task<Board> CreateAsync(CreateBoardRequest request)
     {
+        var components = await _context.Components
+            .Where(c => request.ComponentIds.Contains(c.Id))
+            .ToListAsync();
+
         var board = new Board
         {
             Name = request.Name,
             Description = request.Description,
             Length = request.Length,
-            Width = request.Width
+            Width = request.Width,
+            Components = components
         };
-
-        foreach (var componentId in request.ComponentIds)
-        {
-            board.BoardComponents.Add(new BoardComponent { ComponentId = componentId });
-        }
 
         _context.Boards.Add(board);
         await _context.SaveChangesAsync();
@@ -67,7 +64,7 @@ public class BoardService : IBoardService
     public async Task<Board?> UpdateAsync(int id, UpdateBoardRequest request)
     {
         var board = await _context.Boards
-            .Include(b => b.BoardComponents)
+            .Include(b => b.Components)
             .FirstOrDefaultAsync(b => b.Id == id);
 
         if (board == null) return null;
@@ -77,11 +74,12 @@ public class BoardService : IBoardService
         board.Length = request.Length;
         board.Width = request.Width;
 
-        board.BoardComponents.Clear();
-        foreach (var componentId in request.ComponentIds)
-        {
-            board.BoardComponents.Add(new BoardComponent { ComponentId = componentId });
-        }
+        var components = await _context.Components
+            .Where(c => request.ComponentIds.Contains(c.Id))
+            .ToListAsync();
+
+        board.Components.Clear();
+        board.Components.AddRange(components);
 
         await _context.SaveChangesAsync();
 

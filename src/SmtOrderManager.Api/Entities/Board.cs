@@ -8,6 +8,6 @@ public class Board
     public double Length { get; set; }
     public double Width { get; set; }
 
-    public List<OrderBoard> OrderBoards { get; set; } = new();
-    public List<BoardComponent> BoardComponents { get; set; } = new();
+    public List<Order> Orders { get; set; } = new();
+    public List<Component> Components { get; set; } = new();
 }

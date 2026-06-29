@@ -7,5 +7,5 @@ public class Component
     public string Description { get; set; } = string.Empty;
     public int Quantity { get; set; }
 
-    public List<BoardComponent> BoardComponents { get; set; } = new();
+    public List<Board> Boards { get; set; } = new();
 }

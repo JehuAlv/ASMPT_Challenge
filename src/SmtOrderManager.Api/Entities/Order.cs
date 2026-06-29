@@ -8,5 +8,5 @@ public class Order
     public DateTime OrderDate { get; set; }
     public string Status { get; set; } = "Created";
 
-    public List<OrderBoard> OrderBoards { get; set; } = new();
+    public List<Board> Boards { get; set; } = new();
 }
