@@ -5,8 +5,7 @@ using SmtOrderManager.Api.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Database
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Services
 builder.Services.AddScoped<IOrderService, OrderService>();
@@ -14,8 +13,8 @@ builder.Services.AddScoped<IBoardService, BoardService>();
 builder.Services.AddScoped<IComponentService, ComponentService>();
 
 // Controllers
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
+builder.Services.AddControllers().
+    AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
     });
