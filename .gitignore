@@ -6,6 +6,12 @@
 # dotenv files
 .env
 
+# Logs
+logs/
+
+# SQLite database
+*.db
+
 # User-specific files
 *.rsuser
 *.suo

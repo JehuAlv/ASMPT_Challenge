@@ -1,8 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using SmtOrderManager.Api.Database;
 using SmtOrderManager.Api.Services;
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
 
 // Database
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -34,3 +42,5 @@ app.UseStaticFiles();
 app.MapControllers();
 
 app.Run();
+
+Log.CloseAndFlush();
